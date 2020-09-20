@@ -1,0 +1,547 @@
+Node {
+    type: 'Program',
+        start: 0,
+        end: 190,
+        loc: SourceLocation {
+        start: Position { line: 1, column: 0 },
+        end: Position { line: 14, column: 12 }
+    },
+    range: [ 0, 189 ],
+        body: [
+        Node {
+            type: 'ImportDeclaration',
+            start: 0,
+            end: 42,
+            loc: [SourceLocation],
+            range: [Array],
+            specifiers: [Array],
+            source: [Node]
+        },
+        Node {
+            type: 'ExportNamedDeclaration',
+            start: 44,
+            end: 63,
+            loc: [SourceLocation],
+            range: [Array],
+            declaration: [Node],
+            specifiers: [],
+            source: null
+        },
+        Node {
+            type: 'VariableDeclaration',
+            start: 64,
+            end: 76,
+            loc: [SourceLocation],
+            range: [Array],
+            declarations: [Array],
+            kind: 'const'
+        },
+        Node {
+            type: 'ExportDefaultDeclaration',
+            start: 77,
+            end: 94,
+            loc: [SourceLocation],
+            range: [Array],
+            declaration: [Node]
+        },
+        Node {
+            type: 'ExportNamedDeclaration',
+            start: 95,
+            end: 121,
+            loc: [SourceLocation],
+            range: [Array],
+            declaration: [Node],
+            specifiers: [],
+            source: null
+        },
+        Node {
+            type: 'VariableDeclaration',
+            start: 123,
+            end: 135,
+            loc: [SourceLocation],
+            range: [Array],
+            declarations: [Array],
+            kind: 'const'
+        },
+        Node {
+            type: 'ExportNamedDeclaration',
+            start: 136,
+            end: 156,
+            loc: [SourceLocation],
+            range: [Array],
+            declaration: [Node],
+            specifiers: [],
+            source: null
+        },
+        Node {
+            type: 'ExportNamedDeclaration',
+            start: 158,
+            end: 176,
+            loc: [SourceLocation],
+            range: [Array],
+            declaration: [Node],
+            specifiers: [],
+            source: null
+        },
+        Node {
+            type: 'ExpressionStatement',
+            start: 177,
+            end: 189,
+            loc: [SourceLocation],
+            range: [Array],
+            expression: [Node]
+        }
+    ],
+        sourceType: 'module',
+        comments: [],
+        tokens: [
+        Token {
+            type: 'Keyword',
+            value: 'import',
+            start: 0,
+            end: 6,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'other1',
+            start: 7,
+            end: 13,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ',',
+            start: 13,
+            end: 14,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '{',
+            start: 15,
+            end: 16,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'o1',
+            start: 17,
+            end: 19,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ',',
+            start: 19,
+            end: 20,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'o2',
+            start: 21,
+            end: 23,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '}',
+            start: 24,
+            end: 25,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'from',
+            start: 26,
+            end: 30,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'String',
+            value: "'./other1'",
+            start: 31,
+            end: 41,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 41,
+            end: 42,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'export',
+            start: 44,
+            end: 50,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'const',
+            start: 51,
+            end: 56,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'g',
+            start: 57,
+            end: 58,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 59,
+            end: 60,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Numeric',
+            value: '2',
+            start: 61,
+            end: 62,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 62,
+            end: 63,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'const',
+            start: 64,
+            end: 69,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'a',
+            start: 70,
+            end: 71,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 72,
+            end: 73,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Numeric',
+            value: '1',
+            start: 74,
+            end: 75,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 75,
+            end: 76,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'export',
+            start: 77,
+            end: 83,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'default',
+            start: 84,
+            end: 91,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'a',
+            start: 92,
+            end: 93,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 93,
+            end: 94,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'export',
+            start: 95,
+            end: 101,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'function',
+            start: 102,
+            end: 110,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'fn',
+            start: 111,
+            end: 113,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '(',
+            start: 114,
+            end: 115,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ')',
+            start: 115,
+            end: 116,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '{',
+            start: 117,
+            end: 118,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '}',
+            start: 120,
+            end: 121,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'const',
+            start: 123,
+            end: 128,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'v',
+            start: 129,
+            end: 130,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 131,
+            end: 132,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Numeric',
+            value: '1',
+            start: 133,
+            end: 134,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 134,
+            end: 135,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'export',
+            start: 136,
+            end: 142,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'const',
+            start: 143,
+            end: 148,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'vv',
+            start: 149,
+            end: 151,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 152,
+            end: 153,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'v',
+            start: 154,
+            end: 155,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 155,
+            end: 156,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'export',
+            start: 158,
+            end: 164,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Keyword',
+            value: 'let',
+            start: 165,
+            end: 168,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'v1',
+            start: 169,
+            end: 171,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 172,
+            end: 173,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Numeric',
+            value: '2',
+            start: 174,
+            end: 175,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 175,
+            end: 176,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'v1',
+            start: 177,
+            end: 179,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '=',
+            start: 180,
+            end: 181,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Identifier',
+            value: 'v1',
+            start: 182,
+            end: 184,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: '+',
+            start: 185,
+            end: 186,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Numeric',
+            value: '2',
+            start: 187,
+            end: 188,
+            loc: [SourceLocation],
+            range: [Array]
+        },
+        Token {
+            type: 'Punctuator',
+            value: ';',
+            start: 188,
+            end: 189,
+            loc: [SourceLocation],
+            range: [Array]
+        }
+    ]
+}

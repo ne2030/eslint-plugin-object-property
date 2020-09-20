@@ -1,0 +1,44 @@
+{
+  "name": "eslint-plugin-object-property",
+  "version": "0.0.0",
+  "description": "Prevent using non-exist object property",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin"
+  ],
+  "author": "ne2030",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha tests --recursive"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.11.5",
+    "array-includes": "latest",
+    "debug": "latest",
+    "eslint-module-utils": "latest",
+    "fxjs": "^0.16.3",
+    "fxjs2": "^0.16.3",
+    "requireindex": "~1.1.0",
+    "tsconfig-paths": "latest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.11.5",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.9.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-eslint-plugin": "^2.3.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "license": "ISC"
+}
