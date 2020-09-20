@@ -5,7 +5,9 @@ import { hashObject } from 'eslint-module-utils/hash';
 import * as unambiguous from 'eslint-module-utils/unambiguous';
 import path from 'path';
 import fs from 'fs';
-import { rejectL, valuesL, curry2, map, head, hi, sel, take, go, reverse } from 'fxjs';
+import { tap, mapL, takeAll, filterL, valuesL, curry2, go } from 'fxjs';
+import * as TYPE from './lib/constant_type';
+
 const babelParser = require('@babel/parser');
 
 let NODE;
@@ -14,8 +16,10 @@ const traverseNode = curry2((type, fn, node) => {
   go(
     node,
     valuesL,
-    rejectL(n => n instanceof NODE),
-    map
+    filterL(n => n instanceof NODE),
+    mapL(tap(n => n.type === type ? fn(n) : null)),
+    mapL(n => traverseNode(type, fn, n)),
+    takeAll,
   );
 });
 
@@ -35,6 +39,8 @@ export const analyze = (context) => {
     });
 
     NODE = Object.getPrototypeOf(ast1);
+
+    traverseNode(ast1)
 
     // go(
     //   is_lint ? ast1.body : ast2.program.body,
