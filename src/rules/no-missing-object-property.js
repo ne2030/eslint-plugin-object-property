@@ -1,11 +1,12 @@
 import { analyze } from '../../analyze';
-import { flat, entries, find, identity, reject, equals, match, pluck, take, filter, sel, apply, go, map, mapC, includes, partition, ifElse, pipe, selEq } from 'fxjs';
+import { flat, entries, find, identity, reject, equals, match, pluck, take, filter, sel, apply, go, map, mapC, includes, partition, ifElse, pipe, selEq, curry2, valuesL, flatL, filterL, mapL, tap, takeAll } from 'fxjs';
 import resolve from 'eslint-module-utils/resolve';
 import parse from 'eslint-module-utils/parse';
 import fs from 'fs';
 import * as TYPE from '../constant_type.js';
 import path from 'path';
 import { EXPORT, IMPORT } from '../constant';
+import { Node } from 'acorn';
 
 // cache
 const cache = {};
@@ -13,6 +14,18 @@ const setCache = (imports, exports) => {
   cache.imports = imports;
   cache.exports = exports;
 };
+
+const traverseNode = curry2((type, fn, node) => {
+  go(
+    node,
+    valuesL,
+    flatL,
+    filterL(n => n instanceof Node),
+    mapL(tap(n => n.type === type ? fn(n) : null)),
+    mapL(n => traverseNode(type, fn, n)),
+    takeAll,
+  );
+});
 
 // eslint/lib/util/glob-util has been moved to eslint/lib/util/glob-utils with version 5.3
 // and has been moved to eslint/lib/cli-engine/file-enumerator in version 6
@@ -87,8 +100,6 @@ const getFileExtensions = (settings) => {
  * info: source, specifiers
  */
 const parseImport = (import_declaration, cur_path, context) => {
-  console.log('parse import');
-
   const destFilePath = resolve.relative(import_declaration.source.value, cur_path, context.settings);
 
   const namespaces = go(
@@ -115,8 +126,6 @@ const parseImport = (import_declaration, cur_path, context) => {
 
 // names, form, type
 const parseNamedExport = (export_declaration) => {
-  console.log('parse export');
-
   const parseDeclaration = (declaration) => {
     try {
       if (declaration.type === TYPE.FUNCTION_DECLARATION) return [declaration.id.name];
@@ -135,7 +144,6 @@ const parseNamedExport = (export_declaration) => {
     ns => new Set(ns),
   );
 
-  console.log(names);
   return new Map(Object.entries({
     names,
     form: EXPORT,
@@ -297,6 +305,7 @@ let srcFiles;
 let lastPrepareKey;
 
 const doPreparation = async (src, ignoreExports, context) => {
+  console.log('do prepare!');
   const prepareKey = JSON.stringify({
     src: (src || []).sort(),
     ignoreExports: (ignoreExports || []).sort(),
@@ -306,6 +315,8 @@ const doPreparation = async (src, ignoreExports, context) => {
   if (prepareKey === lastPrepareKey) {
     return;
   }
+
+  console.log('prepare im , ex');
 
   srcFiles = resolveFiles(src || [process.cwd()], ignoreExports, context);
   await prepareImportsAndExports(srcFiles, context);
@@ -324,13 +335,28 @@ module.exports = {
 
     const src = [path.resolve(process.cwd(), './target.js')];
 
-    // await doPreparation(src, ignoreExports, context);
+    await doPreparation(src, ignoreExports, context);
     // export, import 저장하기
     analyze(context);
+
+    const file = context.getFilename();
+    console.log(file);
 
     return {
       'Program:exit': node => {
         console.log('exit!');
+      },
+      [TYPE.MEMBER_EXPRESSION]: node => {
+        console.log(TYPE.MEMBER_EXPRESSION, node);
+      },
+      [TYPE.EXPORT_NAMED_DECLARATION]: node => {
+        console.log(TYPE.EXPORT_NAMED_DECLARATION, node);
+      },
+      [TYPE.EXPORT_DEFAULT_DECLARATION]: node => {
+        console.log(TYPE.EXPORT_DEFAULT_DECLARATION, node);
+      },
+      [TYPE.IMPORT_DECLARATION]: node => {
+        console.log(TYPE.IMPORT_DECLARATION, node);
       },
     };
   }
@@ -340,7 +366,7 @@ module.exports = {
   //     checkExportPresence(node);
   //   },
   //   ExportDefaultDeclaration: node => {
-  //     checkUsage(node, IMPORT_DEFAULT_SPECIFIER);
+  //     checkUsage(node IMPORT_DEFAULT,_SPECIFIER);
   //   },
   //   ExportNamedDeclaration: node => {
   //     node.specifiers.forEach(specifier => {

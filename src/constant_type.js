@@ -15,3 +15,4 @@ export const TS_ENUM_DECLARATION = 'TSEnumDeclaration';
 export const OBJECT_EXPRESSION = 'ObjectExpression';
 export const LITERAL = 'Literal';
 export const IDENTIFIER = 'Identifier';
+export const MEMBER_EXPRESSION = 'MemberExpression';
