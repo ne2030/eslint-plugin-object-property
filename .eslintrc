@@ -28,6 +28,7 @@
       "allowTemplateLiterals": true,
       "avoidEscape": true
     }],
+    "one-var": "off",
     "no-useless-computed-key": "off",
     "camelcase": "off",
     "eslint-plugin/consistent-output": [

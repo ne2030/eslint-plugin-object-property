@@ -7,7 +7,6 @@
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
-
 const requireIndex = require('requireindex');
 
 // ------------------------------------------------------------------------------
@@ -17,4 +16,10 @@ const requireIndex = require('requireindex');
 // import all rules in lib/rules
 Object.defineProperty(exports, '__esModule', { value: true });
 // eslint-disable-next-line no-path-concat
-module.exports.rules = requireIndex(__dirname + '/rules');
+const rules = requireIndex(__dirname + '/rules');
+
+module.exports.rules = rules;
+
+export const config = {
+  errors: require('../config/errors'),
+};

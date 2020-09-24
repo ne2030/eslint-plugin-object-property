@@ -1,0 +1,33 @@
+prepare start!
+process cwd
+finish prepare!
+file :/Users/baegyeonghun/Documents/dev/eslint-plugin-object-property/tests/files/index.js
+
+------------parse finish 
+
+
+
+
+<-----ImportDeclaration---->
+
+
+
+
+<-----ImportDeclaration---->
+
+
+
+
+<-----MemberExpression---->
+
+
+
+
+<-----MemberExpression---->
+
+
+
+
+<-----MemberExpression---->
+
+

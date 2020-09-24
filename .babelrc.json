@@ -3,6 +3,12 @@
   "plugins": ["@babel/plugin-syntax-dynamic-import"],
   "sourceMaps": "inline",
   "retainLines": true,
-  "include": ["target.js", "test.js", "lib", "analyze.js"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "env": {
+    "test": {
+      "plugins": [
+        [ "module-resolver", { "root": [ "./src/" ] } ]
+      ]
+    }
+  }
 }

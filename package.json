@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-object-property",
-  "version": "0.0.0",
+  "version": "0.1.14",
   "description": "Prevent using non-exist object property",
   "keywords": [
     "eslint",
@@ -9,8 +9,17 @@
   ],
   "author": "ne2030",
   "main": "lib/index.js",
+  "files": [
+    "*.md",
+    "LICENSE",
+    "docs",
+    "lib",
+    "config"
+  ],
   "scripts": {
-    "test": "mocha tests --recursive"
+    "build": "babel --quiet --out-dir lib src",
+    "test": "mocha tests --recursive",
+    "deploy": "npm run build && npm publish"
   },
   "dependencies": {
     "@babel/parser": "^7.11.5",
@@ -20,16 +29,22 @@
     "fxjs": "^0.16.3",
     "fxjs2": "^0.16.3",
     "requireindex": "~1.1.0",
-    "tsconfig-paths": "latest"
+    "tsconfig-paths": "latest",
+    "acorn": "^8.0.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
     "@babel/node": "^7.10.5",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
     "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
     "eslint": "^7.9.0",
     "eslint-config-standard": "^14.1.1",
+    "eslint-loader": "^4.0.2",
     "eslint-plugin-eslint-plugin": "^2.3.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
@@ -38,7 +53,7 @@
     "mocha": "^7.2.0"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">4.0.0"
   },
   "license": "ISC"
 }

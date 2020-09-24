@@ -1,18 +1,54 @@
-import { analyze } from '../../analyze';
-import { flat, entries, find, identity, reject, equals, match, pluck, take, filter, sel, apply, go, map, mapC, includes, partition, ifElse, pipe, selEq, curry2, valuesL, flatL, filterL, mapL, tap, takeAll } from 'fxjs';
+import { extend, reduce, flat, entries, find, identity, reject, equals, match, pluck, filter, sel, go, map, partition, curry2, valuesL, flatL, filterL, mapL, tap, takeAll } from 'fxjs';
 import resolve from 'eslint-module-utils/resolve';
-import parse from 'eslint-module-utils/parse';
 import fs from 'fs';
 import * as TYPE from '../constant_type.js';
-import path from 'path';
 import { EXPORT, IMPORT } from '../constant';
 import { Node } from 'acorn';
+require('@babel/polyfill');
+
+const babelParser = require('@babel/parser');
+
+const log = str => {
+  if (str instanceof Error) {
+    str = JSON.stringify({
+      stack: str.stack,
+      message: str.message,
+    });
+  }
+  fs.appendFileSync('./debug-log.txt', str + '\n');
+};
 
 // cache
 const cache = {};
-const setCache = (imports, exports) => {
+const setCache = ({ imports, exports }) => {
   cache.imports = imports;
   cache.exports = exports;
+};
+const updateCache = (path, imports, exports) => {
+  cache.imports.set(path, imports);
+  cache.exports.set(path, exports);
+};
+
+const removePrevCache = path => {
+  cache.imports.delete(path);
+  cache.exports.delete(path);
+};
+
+const getPathImportNamespace = (namespace, filePath) => sel(namespace, cache.imports.get(filePath));
+
+const mergeExport = (_exports) => {
+  const defaultExport = find(e => e.has('keys'), _exports);
+  const mergedNames = go(
+    _exports,
+    filter(e => e.has('names')),
+    map(e => e.get('names')),
+    ns => flat([ns, defaultExport ? 'default' : []], 2),
+  );
+
+  return new Map(entries({
+    names: new Set(mergedNames),
+    default: defaultExport ? defaultExport.get('keys') : new Set(),
+  }));
 };
 
 const traverseNode = curry2((type, fn, node) => {
@@ -95,44 +131,43 @@ const getFileExtensions = (settings) => {
   return exts;
 };
 
+const isNodeModule = path => !/^\.|(\.\.\/)|(\/)/.test(path);
+
 /**
  * parse import declaration
  * info: source, specifiers
  */
 const parseImport = (import_declaration, cur_path, context) => {
+  if (isNodeModule(import_declaration.source.value)) return;
   const destFilePath = resolve.relative(import_declaration.source.value, cur_path, context.settings);
 
-  const namespaces = go(
+  const namespace_indexed_import = go(
     import_declaration,
     sel('specifiers'),
     filter(specifier => [
       TYPE.IMPORT_NAMESPACE_SPECIFIER,
       TYPE.IMPORT_DEFAULT_SPECIFIER,
     ].includes(specifier.type)),
-    map(specifier => ({
-      type: specifier.type === TYPE.IMPORT_DEFAULT_SPECIFIER ? 'default' : 'namespace',
-      namespace: specifier.local.name,
-    })),
+    map(specifier => {
+      const type = specifier.type === TYPE.IMPORT_DEFAULT_SPECIFIER ? 'default' : 'namespace';
+      return {
+        [specifier.local.name]: { type, source: destFilePath },
+      };
+    }),
+    xs => extend({}, ...xs),
   );
 
-  if (!namespaces || !namespaces.length) return;
-
-  return new Map(Object.entries({
+  return new Map(entries({
     form: IMPORT,
-    source: destFilePath,
-    namespaces,
+    namespace_indexed_import,
   }));
 };
 
 // names, form, type
 const parseNamedExport = (export_declaration) => {
   const parseDeclaration = (declaration) => {
-    try {
-      if (declaration.type === TYPE.FUNCTION_DECLARATION) return [declaration.id.name];
-      return map(d => d.id.name, declaration.declarations);
-    } catch (err) {
-      console.log(declaration);
-    }
+    if (declaration.type === TYPE.FUNCTION_DECLARATION) return [declaration.id.name];
+    return map(d => d.id.name, declaration.declarations);
   };
 
   const names = go(
@@ -150,6 +185,7 @@ const parseNamedExport = (export_declaration) => {
   }));
 };
 
+// export declaration -> exportsMap
 const parseDefaultExport = (export_declaration) => {
   if (export_declaration.declaration.type !== TYPE.OBJECT_EXPRESSION) return;
 
@@ -173,141 +209,44 @@ const parseDefaultExport = (export_declaration) => {
 /**
  * parse all source files and build up 2 maps containing the existing imports and exports
  */
-const prepareImportsAndExports = async (srcFiles, context) => {
-  await go(
-    srcFiles,
-    take(2),
-    mapC(async (file) => {
-      try {
-        const content = fs.readFileSync(file);
+const prepareImportsAndExports = (file, context) => {
+  const content = fs.readFileSync(file).toString();
 
-        const ast = parse(resolve(file, context), content, context);
+  // const ast = parse(resolve(file, context), content, context);
+  const ast = babelParser.parse(content, {
+    sourceType: 'unambiguous',
+  }).program;
 
-        const [exports, imports] = go(
-          ast.body,
-          map(node => {
-            const cur_path = resolve(file, context);
-            return match(node.type)
-              .case(equals(TYPE.IMPORT_DECLARATION))(() => parseImport(node, cur_path, context))
-              .case(equals(TYPE.EXPORT_NAMED_DECLARATION))(() => parseNamedExport(node))
-              .case(equals(TYPE.EXPORT_DEFAULT_DECLARATION))(() => parseDefaultExport(node));
-          }),
-          filter(identity),
-          partition(line => line.get('form') === IMPORT),
-          ([_imports, _exports]) => {
-            const defaultExport = find(e => e.has('keys'), _exports);
-            const mergedNames = go(
-              _exports,
-              filter(e => e.has('names')),
-              pluck('names'),
-              ns => flat([ns, defaultExport ? 'default' : []]),
-            );
-
-            const __exports = new Map(entries({
-              names: new Set(mergedNames),
-              ...(defaultExport ? {
-                default: defaultExport.get('keys'),
-              } : {}),
-            }));
-
-            return [_imports, __exports];
-          },
-        );
-
-        setCache(exports, imports);
-        console.log('finish prepare!');
-      } catch (err) {
-        console.log(err);
-      }
+  return go(
+    ast.body,
+    map(node => {
+      const cur_path = resolve(file, context);
+      return match(node.type)
+        .case(equals(TYPE.IMPORT_DECLARATION))(() => parseImport(node, cur_path, context))
+        .case(equals(TYPE.EXPORT_NAMED_DECLARATION))(() => parseNamedExport(node))
+        .case(equals(TYPE.EXPORT_DEFAULT_DECLARATION))(() => parseDefaultExport(node))
+        .else(() => null);
     }),
-  );
+    filter(identity),
+    partition(line => line.get('form') === EXPORT),
+    ([_exports, _imports]) => {
+      const __imports = go(
+        _imports,
+        map(i => i.get('namespace_indexed_import')),
+        (objs) => extend({}, ...objs),
+      );
 
-  //     const currentExports = Exports.get(file, context);
-  //     if (currentExports) {
-  //       const { dependencies, reexports, imports: localImportList, namespace } = currentExports;
-  //
-  //       // dependencies === export * from
-  //       const currentExportAll = new Set();
-  //       dependencies.forEach(getDependency => {
-  //         const dependency = getDependency();
-  //         if (dependency === null) {
-  //           return;
-  //         }
-  //
-  //         currentExportAll.add(dependency.path);
-  //       });
-  //       exportAll.set(file, currentExportAll);
-  //
-  //       reexports.forEach((value, key) => {
-  //         if (key === DEFAULT) {
-  //           exports.set(IMPORT_DEFAULT_SPECIFIER, { whereUsed: new Set() });
-  //         } else {
-  //           exports.set(key, { whereUsed: new Set() });
-  //         }
-  //         const reexport = value.getImport();
-  //         if (!reexport) {
-  //           return;
-  //         }
-  //         let localImport = imports.get(reexport.path);
-  //         let currentValue;
-  //         if (value.local === DEFAULT) {
-  //           currentValue = IMPORT_DEFAULT_SPECIFIER;
-  //         } else {
-  //           currentValue = value.local;
-  //         }
-  //         if (typeof localImport !== 'undefined') {
-  //           localImport = new Set([...localImport, currentValue]);
-  //         } else {
-  //           localImport = new Set([currentValue]);
-  //         }
-  //         imports.set(reexport.path, localImport);
-  //       });
-  //
-  //       localImportList.forEach((value, key) => {
-  //         if (isNodeModule(key)) {
-  //           return;
-  //         }
-  //         let localImport = imports.get(key);
-  //         if (typeof localImport !== 'undefined') {
-  //           localImport = new Set([...localImport, ...value.importedSpecifiers]);
-  //         } else {
-  //           localImport = value.importedSpecifiers;
-  //         }
-  //         imports.set(key, localImport);
-  //       });
-  //       importList.set(file, imports);
-  //
-  //       namespace.forEach((value, key) => {
-  //         if (key === DEFAULT) {
-  //           exports.set(IMPORT_DEFAULT_SPECIFIER, { whereUsed: new Set() });
-  //         } else {
-  //           exports.set(key, { whereUsed: new Set() });
-  //         }
-  //       });
-  //     }
-  //     exports.set(EXPORT_ALL_DECLARATION, { whereUsed: new Set() });
-  //     exports.set(IMPORT_NAMESPACE_SPECIFIER, { whereUsed: new Set() });
-  //     exportList.set(file, exports);
-  //   } catch (err) {
-  //
-  //   }
-  // }, srcFiles);
-  // exportAll.forEach((value, key) => {
-  //   value.forEach(val => {
-  //     const currentExports = exportList.get(val);
-  //     const currentExport = currentExports.get(EXPORT_ALL_DECLARATION);
-  //     currentExport.whereUsed.add(key);
-  //   });
-  // });
+      return [__imports, mergeExport(_exports)];
+    },
+  );
 };
 
 let srcFiles;
 let lastPrepareKey;
 
-const doPreparation = async (src, ignoreExports, context) => {
-  console.log('do prepare!');
+const parseAll = (ignoreExports, context) => {
+  log('prepare start!');
   const prepareKey = JSON.stringify({
-    src: (src || []).sort(),
     ignoreExports: (ignoreExports || []).sort(),
     extensions: Array.from(getFileExtensions(context.settings)).sort(),
   });
@@ -315,67 +254,84 @@ const doPreparation = async (src, ignoreExports, context) => {
   if (prepareKey === lastPrepareKey) {
     return;
   }
+  log('process cwd', process.cwd());
 
-  console.log('prepare im , ex');
+  srcFiles = resolveFiles([process.cwd()], ignoreExports, context);
+  // srcFiles = resolveFiles([path.join(process.cwd(), './tests')], ignoreExports, context);
 
-  srcFiles = resolveFiles(src || [process.cwd()], ignoreExports, context);
-  await prepareImportsAndExports(srcFiles, context);
+  go(
+    srcFiles,
+    map(file => [file, ...prepareImportsAndExports(file, context)]),
+    parse_results => reduce((acc, [file, _imports, _exports]) => {
+      acc.imports.set(file, _imports);
+      acc.exports.set(file, _exports);
+      return acc;
+    }, { imports: new Map(), exports: new Map() }, parse_results),
+    setCache,
+  );
+
   lastPrepareKey = prepareKey;
 };
+
+const parseFile = (path, context) =>
+  go(
+    removePrevCache(path),
+    () => prepareImportsAndExports(path, context),
+    updateCache,
+  );
 
 module.exports = {
   meta: {
     type: 'problem',
     schema: [],
   },
-  create: async context => {
+  create: context => {
     const {
       ignoreExports = [],
     } = context.options[0] || {};
 
-    const src = [path.resolve(process.cwd(), './target.js')];
-
-    await doPreparation(src, ignoreExports, context);
-    // export, import 저장하기
-    analyze(context);
-
     const file = context.getFilename();
-    console.log(file);
+
+    log('file :' + file);
+
+    parseAll(ignoreExports, context);
+    parseFile(file);
+
+    log('------------parse finish \n\n');
 
     return {
-      'Program:exit': node => {
-        console.log('exit!');
-      },
-      [TYPE.MEMBER_EXPRESSION]: node => {
-        console.log(TYPE.MEMBER_EXPRESSION, node);
-      },
-      [TYPE.EXPORT_NAMED_DECLARATION]: node => {
-        console.log(TYPE.EXPORT_NAMED_DECLARATION, node);
-      },
-      [TYPE.EXPORT_DEFAULT_DECLARATION]: node => {
-        console.log(TYPE.EXPORT_DEFAULT_DECLARATION, node);
-      },
-      [TYPE.IMPORT_DECLARATION]: node => {
-        console.log(TYPE.IMPORT_DECLARATION, node);
+      MemberExpression: node => {
+        log(`\n\n<-----${TYPE.MEMBER_EXPRESSION}---->\n\n`);
+        const namespace = node.object.name;
+        const property = node.property.name;
+
+        if (node.object.type !== TYPE.IDENTIFIER) return;
+        if (node.property.type !== TYPE.IDENTIFIER) return;
+
+        const namespaceInfo = getPathImportNamespace(namespace, file);
+
+        if (!namespaceInfo) return;
+
+        const exportInfo = cache.exports.get(namespaceInfo.source);
+
+        if (namespaceInfo.type === 'default' && !exportInfo.get('default').has(property)) {
+          return context.report(
+            node,
+            `imported default namespace '${namespace}' does not have object property '${property}'`,
+          );
+        }
+
+        if (
+          namespaceInfo.type === 'namespace' &&
+          !exportInfo.get('names').has(property) &&
+          !exportInfo.get('names').length // default 가 없는 경우
+        ) {
+          return context.report(
+            node,
+            `imported '* as' namespace '${namespace}' does not have named export '${property}'`,
+          );
+        }
       },
     };
-  }
-  //   'Program:exit': node => {
-  //     updateExportUsage(node);
-  //     updateImportUsage(node);
-  //     checkExportPresence(node);
-  //   },
-  //   ExportDefaultDeclaration: node => {
-  //     checkUsage(node IMPORT_DEFAULT,_SPECIFIER);
-  //   },
-  //   ExportNamedDeclaration: node => {
-  //     node.specifiers.forEach(specifier => {
-  //       checkUsage(node, specifier.exported.name);
-  //     });
-  //     forEachDeclarationIdentifier(node.declaration, (name) => {
-  //       checkUsage(node, name);
-  //     });
-  //   },
-  // };
-  ,
+  },
 };

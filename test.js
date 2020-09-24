@@ -3,7 +3,7 @@ import path from 'path';
 
 const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 9, sourceType: 'module' } });
 
-const rule = require('./lib/rules/no-missing-object-property');
+const rule = require('./src/rules/no-missing-object-property');
 ruleTester.run('no-missing-object-property', rule, {
   valid: [{
     code: `

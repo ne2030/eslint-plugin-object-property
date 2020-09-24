@@ -1,7 +1,6 @@
-import other1, { o1, o2 as oo2 } from './other1';
-import * as all from './other1';
-import { other2 } from './other2.mjs';
-import { other3 } from './other3.cjs';
+import b_default, { b1, b2 as b3 } from './file-b.js';
+import * as b_all from './file-b.js';
+import a1 from './pathA/file-a.js';
 
 export const g = 2;
 const a = 1;
@@ -25,12 +24,10 @@ const v2 = 1;
 export { v2 };
 export { v2 as v3 };
 
-export { default as abc } from './other1';
-export * from './other1';
-export { o2 } from './other1.js';
-export { o1 as o3, o2 as o4 } from './other1.js';
-// export { default } from './other1';
-// export { default } from './other2';
+export { default as abc } from './file-b.js';
+export * from './pathA/file-a.js';
+export { o2 } from './file-b.js';
+export { o1 as o3, o2 as o4 } from './pathA/file-a.js';
 
 export const efaef = {
   a: 1,
@@ -47,7 +44,7 @@ export const efaef = {
 // let ddd;
 // const aewfaw = import(ddd = 1);
 
-export const eddd = 1; const b = 2;
+export const eddd = 1, b = 2;
 
 // Default Exports
 
@@ -74,6 +71,12 @@ export default {
   ['abcde']: 123,
   [str]: 234,
   normal: 324,
+  default_1: 1,
+  default_2: 1,
+  default_3: 1,
 };
 
 // export default [1, 2, 3, 4, 5];
+
+str.addd();
+const e = add.e;
