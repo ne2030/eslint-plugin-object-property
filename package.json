@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-object-property",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Prevent using non-exist object property",
   "keywords": [
     "eslint",
